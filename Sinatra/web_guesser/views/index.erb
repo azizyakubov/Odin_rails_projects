@@ -17,7 +17,8 @@
       <input type='submit' value='Guess!' />
     </form>
 
-      <p> The SECRET NUMBER is <%= number %></p>
-
+    <% if number == params["guess"].to_i || params["cheat"] == "true" %>
+        <p><i>You cheater...the secret number is:  <%= number %></i></p>
+    <% end %>
   </body>
 </html>
