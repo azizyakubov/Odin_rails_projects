@@ -1,1 +1,7 @@
-# leave empty until chapter 8
+# creating a fixture for users_login_test.rb and can be accessed by user = users(:michael)
+michael:
+  name: Michael Example
+  email: michael@example.com
+  password_digest: <%= User.digest('password') %>
+
+  
