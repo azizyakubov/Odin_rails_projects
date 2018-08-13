@@ -25,7 +25,7 @@ module SessionsHelper
       # we can be confident of catching regressions without having to check by hand.
       # => sessions_helper_test.rb
       user = User.find_by(id: user_id)
-      if user && user.authenticated?(cookies[:remember_token])
+      if user && user.authenticated?(:remember, cookies[:remember_token])
         log_in user
         @current_user = user
       end
