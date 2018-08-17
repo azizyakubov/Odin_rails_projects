@@ -12,6 +12,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     redirect_to root_url and return unless @user.activated?
     # debugger   #Ctrl+D to release debugger
+    @microposts = @user.microposts.paginate(page: params[:page])
   end
 
   def new
@@ -47,6 +48,8 @@ class UsersController < ApplicationController
     flash[:success] = "User deleted"
     redirect_to users_url
   end
+
+  
   private
   # Strong parameters that only permit necessary info for the #create method
   def user_params
@@ -55,15 +58,6 @@ class UsersController < ApplicationController
 
   # Before filters. By default, before filters apply to every action in the controller.
   # You can restrict by passing in only: [:edit, :update] etc
-
-   # Confirms a logged-in user.
-   def logged_in_user
-     unless logged_in?
-       store_location
-       flash[:danger] = "Please log in."
-       redirect_to login_url
-     end
-   end
 
    # Confirms the correct user.
    #Note that the @user variable is defined here, and used in the before_action
