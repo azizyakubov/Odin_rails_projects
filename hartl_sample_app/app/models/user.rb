@@ -1,5 +1,15 @@
 class User < ApplicationRecord
   has_many :microposts, dependent: :destroy
+  has_many :active_relationships, class_name:  "Relationship",
+                                  foreign_key: "follower_id",
+                                  dependent:   :destroy
+
+  has_many :following, through: :active_relationships, source: :followed
+
+  has_many :passive_relationships, class_name:  "Relationship",
+                                   foreign_key: "followed_id",
+                                   dependent:   :destroy
+  has_many :followers, through: :passive_relationships, source: :follower
 
   attr_accessor :remember_token, :activation_token, :reset_token
 
@@ -77,10 +87,32 @@ class User < ApplicationRecord
     reset_sent_at < 2.hours.ago
   end
 
+  #Returns a user's status feed.
+  # https://www.railstutorial.org/book/following_users#sec-a_first_feed_implementation
+  # contains the explanation behind following_ids, which was generated from
+  # Active Record's has_many :following association. Only need to append _ids to have
+  # access to the array of ids that the user follows (corresponding user.following collection)
   def feed
-    Micropost.where("user_id = ?", id)
+    following_ids = "SELECT followed_id FROM relationships
+                     WHERE  follower_id = :user_id"
+    Micropost.where("user_id IN (#{following_ids})
+                    OR user_id = :user_id", user_id: id)
   end
 
+  #Follows a user
+  def follow(other_user)
+    following << other_user
+  end
+
+  #Unfollows a user
+  def unfollow(other_user)
+    following.delete(other_user)
+  end
+
+  #Returns true if the current user is following another user
+  def following?(other_user)
+    following.include?(other_user)
+  end
 
   private
 
